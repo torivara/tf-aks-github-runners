@@ -1,0 +1,7 @@
+tenant_id = "your-tenant-id-here"
+tags = {
+  contact = "email@domain.com"
+  createdBy = "email@domain.com"
+  createdDate = "2021-09-18"
+  environment = "Test"
+}

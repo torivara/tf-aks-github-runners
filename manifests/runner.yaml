@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: actions-runner
+  namespace: runners
+spec:
+  replicas: 1 # Increase the count to get more runners
+  selector:
+    matchLabels:
+      app: actions-runner
+  template:
+    metadata:
+      labels:
+        app: actions-runner
+    spec:
+      volumes:
+      - name: dockersock
+        hostPath:
+          path: /var/run/docker.sock
+      - name: workdir
+        hostPath:
+          path: /tmp/github-runner-tf-<yourRepositoryName> # Update this to reflect your repository name, without the <>
+      containers:
+      - name: runner
+        image: <youracrname>.azurecr.io/myoung34/github-runner:latest # Add your acr name here. You can also find the image url with tag and all in your acr, under the repositories subcategory. Remove the <>.
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        env:
+        # Adding access token as a kubernetes secret
+        # This is the next best thing after using Key Vaults
+        - name: ACCESS_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: gh-runner
+              key: ACCESS_TOKEN
+        # Use this section if you want plain text secret in yaml file
+        # Be advised that this is not in any way a good practice!
+        #- name: ACCESS_TOKEN
+        #  value: foo-access-token
+        - name: RUNNER_SCOPE
+          value: "repo"
+        - name: LABELS
+          value: my-label,other-label
+        - name: REPO_URL
+          value: https://github.com/<yourGitHubUserName>/tf-<yourRepositoryName> # Update this to reflect your repository name, without the <>
+        - name: RUNNER_NAME_PREFIX
+          value: gh-runner
+        - name: RUNNER_WORKDIR
+          value: /tmp/github-runner-tf-<yourRepositoryName> # Update this to reflect your repository name, without the <>
+        # - name: RUNNER_GROUP
+        #   value: my-runners
+        volumeMounts:
+        - name: dockersock
+          mountPath: /var/run/docker.sock
+        - name: workdir
+          mountPath: /tmp/github-runner-tf-<yourRepositoryName> # Update this to reflect your repository name, without the <>
