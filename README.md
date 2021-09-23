@@ -4,7 +4,7 @@ Repository with terraform code and kubernetes manifests for running self-hosted 
 
 ## Deployment
 
-Follow this blog post for guidance on deployment. TBD.
+Follow [this](https://bit.ly/3tZBKSk) blog post for guidance on deployment.
 
 ## Repository Structure
 
